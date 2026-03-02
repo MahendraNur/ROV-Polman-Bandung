@@ -1,26 +1,35 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MenuCard } from '../components/MenuCard';
 
 const menus = [
-  { title: 'Autopilot Firmware',   desc: 'Update flight controller firmware to latest stable release.', icon: '🚀' },
-  { title: 'Autopilot Parameters', desc: 'View and modify all vehicle parameters in real-time.',         icon: '📑' },
-  { title: 'System Information',   desc: 'CPU, memory usage, temperature and network diagnostics.',      icon: '📊' },
-  { title: 'Video Streams',        desc: 'Manage and configure all video input devices.',                icon: '📹' },
-  { title: 'Vehicle Setup',        desc: 'Sensor calibrations, ESC mapping and motor tests.',            icon: '⚙️' },
+  { path: '/firmware', title: 'Autopilot Firmware',  desc: 'Update flight controller firmware.', icon: '🚀' },
+  { path: '/params',   title: 'Autopilot Parameters',desc: 'Modify vehicle parameters in real-time.', icon: '📑' },
+  { path: '/live',     title: 'Live Telemetry',      desc: 'Real-time sensor data and video stream.', icon: '📊' },
+  { path: '/video',    title: 'Video Streams',       desc: 'Configure all video input devices.',      icon: '📹' },
+  { path: '/setup',    title: 'Vehicle Setup',       desc: 'Sensor calibrations and motor tests.',    icon: '⚙️' },
 ];
 
-export const Home: React.FC = () => (
-  <div className="space-y-6 animate-in fade-in duration-500">
-    <div>
-      <h2 className="font-display font-black text-lg text-white uppercase tracking-wide">System Menu</h2>
-      <p className="text-[11px] font-mono text-slate-500 mt-1">
-        ROV POLMAN BANDUNG · Industrial Informatics Ground Station
-      </p>
+export const Home: React.FC = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="mb-8">
+        <h2 className="font-display font-black text-xl text-white uppercase tracking-wider">ROV Ground Station</h2>
+        <p className="text-[11px] font-mono text-slate-400 mt-1 uppercase tracking-widest">Main Control Menu</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {menus.map((m) => (
+          <MenuCard 
+            key={m.path} 
+            icon={m.icon} 
+            title={m.title} 
+            description={m.desc} 
+            onClick={() => navigate(m.path)} // Pindah ke alamat path
+          />
+        ))}
+      </div>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-      {menus.map((m, i) => (
-        <MenuCard key={i} icon={m.icon} title={m.title} description={m.desc} />
-      ))}
-    </div>
-  </div>
-);
+  );
+};

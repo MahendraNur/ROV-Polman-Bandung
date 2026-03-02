@@ -4,6 +4,6 @@ export interface TelemetryData {
   voltage: number;
   status: 'CONNECTED' | 'DISCONNECTED';
   mode: string;
-  pitch: number; // Tambahkan ini
-  roll: number;  // Tambahkan ini
+  pitch: number;
+  roll: number;
 }
