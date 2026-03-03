@@ -8,7 +8,8 @@ import { Navbar } from './layouts/Navbar';
 // Import Views
 import { Home } from './views/Home';
 import { Dashboard } from './views/Dashboard';
-import ParamsView from './views/params'; // 1. IMPORT KOMPONEN BARU KAMU DI SINI
+import ParamsView from './views/params'; 
+import MissionControl from './views/Mission'; // IMPORT BARU
 
 // Import Types
 import { TelemetryData } from './types/telemetry';
@@ -29,6 +30,7 @@ function App() {
     roll: 0
   });
 
+  // Simulasi data sensor ROV
   useEffect(() => {
     const interval = setInterval(() => {
       setTelemetry(prev => ({
@@ -50,40 +52,45 @@ function App() {
         isDarkMode ? 'bg-[#0b111a] text-slate-200' : 'bg-slate-50 text-slate-900'
       }`}>
         
+        {/* Sidebar tetap di kiri */}
         <Sidebar isDarkMode={isDarkMode} />
 
         <div className={`flex-1 flex flex-col h-full relative transition-colors duration-300 ${
           isDarkMode ? 'bg-[#1e4e8c]' : 'bg-blue-500'
         }`}>
           
+          {/* Background dots aksen untuk Ground Station */}
           <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:30px_30px] z-0"></div>
 
+          {/* Navbar Global */}
           <Navbar 
             telemetry={telemetry} 
             isDarkMode={isDarkMode} 
             toggleMode={() => setIsDarkMode(!isDarkMode)} 
           />
 
+          {/* Area Konten Utama */}
           <main className="flex-1 overflow-y-auto p-6 md:p-8 z-10">
             <div className="max-w-7xl mx-auto">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/live" element={<Dashboard telemetry={telemetry} />} />
-                
-                {/* Tampilan Simulasi Gazebo */}
                 <Route path="/simulation" element={<Simulation />} /> 
-                
-                {/* 2. GANTI BARIS INI: Sekarang memanggil ParamsView yang asli */}
                 <Route path="/params" element={<ParamsView />} /> 
+
+                {/* ROUTE MISSION CONTROL YANG BARU DITAMBAHKAN */}
+                <Route path="/mission" element={<MissionControl />} /> 
 
                 <Route path="/video" element={<div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">📹 Pengaturan Video Stream</div>} />
                 <Route path="/setup" element={<div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">⚙️ Kalibrasi Sensor & Motor</div>} />
 
+                {/* Redirect jika route tidak ditemukan */}
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>
           </main>
 
+          {/* Footer Identitas Kampus */}
           <footer className={`h-6 px-6 flex items-center justify-between text-[9px] font-mono border-t z-10 ${
             isDarkMode ? 'bg-[#111827]/90 border-white/10 text-slate-500' : 'bg-white/80 border-black/5 text-slate-600'
           }`}>
