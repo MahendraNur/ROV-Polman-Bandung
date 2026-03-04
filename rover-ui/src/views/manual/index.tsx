@@ -1,52 +1,109 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export const Manual: React.FC = () => {
-  // 1. State Kendali 6-DOF
+  // 1. State Telemetri & WebSocket
+  const [telemetry, setTelemetry] = useState({ roll: 0, pitch: 0, yaw: 0 });
+  const [connStatus, setConnStatus] = useState("Terputus 🔴");
+  const ws = useRef<WebSocket | null>(null);
+
+  // 2. State Kendali 6-DOF (MAVLink PWM Standard: 1100 - 1900, Netral: 1500)
   const [controls, setControls] = useState({
-    surge: 0, sway: 0, heave: 0, roll: 0, pitch: 0, yaw: 0
+    forward: 1500, lateral: 1500, vertical: 1500, roll: 1500, pitch: 1500, yaw: 1500
   });
 
-  // 2. State Fitur Pendukung
-  const [isLive, setIsLive] = useState(false);
+  // 3. State Fitur Pendukung
+  const [isArmed, setIsArmed] = useState(false);
   const [missionTime, setMissionTime] = useState(0);
   const [lights, setLights] = useState(false);
-  const [gripper, setGripper] = useState(0); // 0: Closed, 100: Open
-  const [isRecording, setIsRecording] = useState(false);
+  const [gripper, setGripper] = useState(0); 
 
-  // 3. Efek Timer Misi (Hanya jalan kalau Live)
+  // --- WEBSOCKET CONNECTION ---
+  useEffect(() => {
+    ws.current = new WebSocket("ws://127.0.0.1:8000/ws/telemetry");
+    
+    ws.current.onopen = () => setConnStatus("Terhubung 🟢");
+    ws.current.onclose = () => {
+      setConnStatus("Terputus 🔴");
+      setIsArmed(false);
+    };
+    
+    ws.current.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      if (data.type === "ATTITUDE") {
+        setTelemetry({ roll: data.roll, pitch: data.pitch, yaw: data.yaw });
+      }
+    };
+
+    return () => { if (ws.current) ws.current.close(); };
+  }, []);
+
+  // --- MISSION TIMER ---
   useEffect(() => {
     let interval: any;
-    if (isLive) {
+    if (isArmed) {
       interval = setInterval(() => setMissionTime(t => t + 1), 1000);
     } else {
       setMissionTime(0);
     }
     return () => clearInterval(interval);
-  }, [isLive]);
+  }, [isArmed]);
 
-  // Format Waktu ke MM:SS
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  // Handler Input (Slider & Textbox)
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (value === "" || value === "-") {
-      setControls(prev => ({ ...prev, [name]: value as any }));
-      return;
-    }
-    const numericValue = parseInt(value);
-    if (!isNaN(numericValue)) {
-      const constrainedValue = Math.max(-100, Math.min(100, numericValue));
-      setControls(prev => ({ ...prev, [name]: constrainedValue }));
+  // --- PENGIRIMAN DATA MAVLINK ---
+  const sendRC = (newControls: typeof controls) => {
+    const channelMap = { pitch: 1, roll: 2, vertical: 3, yaw: 4, forward: 5, lateral: 6 };
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({
+        action: "rc",
+        channels: {
+          [channelMap.pitch]: newControls.pitch,
+          [channelMap.roll]: newControls.roll,
+          [channelMap.vertical]: newControls.vertical,
+          [channelMap.yaw]: newControls.yaw,
+          [channelMap.forward]: newControls.forward,
+          [channelMap.lateral]: newControls.lateral
+        }
+      }));
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const numericValue = parseInt(value);
+    
+    if (!isNaN(numericValue)) {
+      const constrainedValue = Math.max(1100, Math.min(1900, numericValue));
+      const updated = { ...controls, [name]: constrainedValue };
+      setControls(updated);
+      sendRC(updated);
+    }
+  };
+
+  // --- FUNGSI RESET MASTER (Semua 1500) ---
   const resetControls = () => {
-    setControls({ surge: 0, sway: 0, heave: 0, roll: 0, pitch: 0, yaw: 0 });
+    const neutral = { forward: 1500, lateral: 1500, vertical: 1500, roll: 1500, pitch: 1500, yaw: 1500 };
+    setControls(neutral);
+    sendRC(neutral);
+  };
+
+  // --- FUNGSI RESET INDIVIDU (Per Slider) ---
+  const resetSingleAxis = (axis: keyof typeof controls) => {
+    const updated = { ...controls, [axis]: 1500 };
+    setControls(updated);
+    sendRC(updated);
+  };
+
+  const toggleArm = () => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      const action = isArmed ? "disarm" : "arm";
+      ws.current.send(JSON.stringify({ action }));
+      setIsArmed(!isArmed);
+    }
   };
 
   return (
@@ -57,10 +114,10 @@ export const Manual: React.FC = () => {
         <div>
           <h2 className="font-display font-black text-xl text-white uppercase tracking-wider flex items-center gap-3">
             <span className="bg-blue-600 p-2 rounded-lg">🕹️</span>
-            Manual Manual (6-DOF)
+            Manual Override (6-DOF)
           </h2>
-          <p className="text-[11px] font-mono text-slate-400 mt-2 uppercase tracking-widest">
-            SITL Environment · ROS 2 Jazzy Jalisco
+          <p className="text-[11px] font-mono mt-2 uppercase tracking-widest text-blue-400">
+            {connStatus} · ArduSub SITL Backend
           </p>
         </div>
 
@@ -70,16 +127,17 @@ export const Manual: React.FC = () => {
             <span className="text-white text-sm font-bold">{formatTime(missionTime)}</span>
           </div>
           <div className="bg-black/40 px-3 py-1.5 rounded border border-white/5">
-            <span className="text-slate-500 block">EST_DEPTH</span>
-            <span className="text-blue-400 text-sm font-bold">{(12.5 + (controls.heave * -0.05)).toFixed(1)} m</span>
+            <span className="text-slate-500 block">REAL_PITCH</span>
+            <span className="text-purple-400 text-sm font-bold">{telemetry.pitch}°</span>
           </div>
+          
           <button 
-            onClick={() => setIsLive(!isLive)}
+            onClick={toggleArm}
             className={`px-6 py-2 rounded font-bold transition-all border ${
-              isLive ? 'bg-green-500/20 text-green-400 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.1)]' : 'bg-slate-800 text-slate-500 border-white/5'
+              isArmed ? 'bg-red-500/20 text-red-500 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'bg-slate-800 text-slate-500 border-white/5'
             }`}
           >
-            {isLive ? '● DISENGAGE SITL' : '○ INITIALIZE SITL'}
+            {isArmed ? '🛑 DISARM MOTORS' : '⚙️ ARM VEHICLE'}
           </button>
         </div>
       </div>
@@ -90,90 +148,124 @@ export const Manual: React.FC = () => {
         <div className="lg:col-span-8 space-y-6">
           <div className="bg-[#111827] p-8 rounded-xl border border-white/5 shadow-2xl relative overflow-hidden">
             <div className="flex justify-between items-center mb-10">
-              <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Manual Setpoints (Direct Drive)</h3>
-              <button onClick={resetControls} className="text-[9px] text-red-500 font-black hover:underline uppercase">Emergency Cutoff</button>
+              <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Manual Setpoints (PWM)</h3>
+              <button onClick={resetControls} className="text-[10px] bg-yellow-500/20 text-yellow-500 px-3 py-1 rounded font-black hover:bg-yellow-500/40 uppercase transition-all">
+                EMERGENCY NEUTRAL (ALL)
+              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+              
               {/* Linear Section */}
               <div className="space-y-8">
-                <p className="text-[9px] font-bold text-blue-500 uppercase border-b border-white/5 pb-2">Linear Axis</p>
-                {['surge', 'sway', 'heave'].map((axis) => (
+                <p className="text-[9px] font-bold text-blue-500 uppercase border-b border-white/5 pb-2">Linear Axis (Ch 5, 6, 3)</p>
+                {['forward', 'lateral', 'vertical'].map((axis) => (
                   <div key={axis} className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase">{axis}</label>
+                      <div className="flex items-center gap-2">
+                        <label className="text-[10px] font-mono text-slate-400 uppercase">{axis}</label>
+                        {/* TOMBOL RESET INDIVIDU */}
+                        <button 
+                          onClick={() => resetSingleAxis(axis as keyof typeof controls)}
+                          className="bg-slate-800 hover:bg-blue-600 text-slate-400 hover:text-white rounded px-1.5 py-0.5 text-[10px] transition-colors"
+                          title="Reset ke Netral (1500)"
+                        >
+                          ↺
+                        </button>
+                      </div>
                       <input 
                         type="number" name={axis} value={controls[axis as keyof typeof controls]} onChange={handleInputChange}
-                        className="w-16 bg-black/60 border border-white/10 rounded px-2 py-1 text-xs font-mono text-center text-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus:outline-none focus:border-blue-500"
+                        className="w-16 bg-black/60 border border-white/10 rounded px-2 py-1 text-xs font-mono text-center text-blue-400 focus:outline-none focus:border-blue-500"
                       />
                     </div>
-                    <input type="range" name={axis} min="-100" max="100" value={controls[axis as keyof typeof controls]} onChange={handleInputChange} className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500" />
+                    {/* Event onDoubleClick untuk reset cepat dari bar slider */}
+                    <input 
+                      type="range" name={axis} min="1100" max="1900" 
+                      value={controls[axis as keyof typeof controls]} 
+                      onChange={handleInputChange} 
+                      onDoubleClick={() => resetSingleAxis(axis as keyof typeof controls)}
+                      className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500" 
+                      title="Geser, atau klik ganda (double-click) untuk mereset"
+                    />
                   </div>
                 ))}
               </div>
 
               {/* Rotational Section */}
               <div className="space-y-8">
-                <p className="text-[9px] font-bold text-purple-500 uppercase border-b border-white/5 pb-2">Angular Axis</p>
+                <p className="text-[9px] font-bold text-purple-500 uppercase border-b border-white/5 pb-2">Angular Axis (Ch 2, 1, 4)</p>
                 {['roll', 'pitch', 'yaw'].map((axis) => (
                   <div key={axis} className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase">{axis}</label>
+                      <div className="flex items-center gap-2">
+                        <label className="text-[10px] font-mono text-slate-400 uppercase">{axis}</label>
+                        {/* TOMBOL RESET INDIVIDU */}
+                        <button 
+                          onClick={() => resetSingleAxis(axis as keyof typeof controls)}
+                          className="bg-slate-800 hover:bg-purple-600 text-slate-400 hover:text-white rounded px-1.5 py-0.5 text-[10px] transition-colors"
+                          title="Reset ke Netral (1500)"
+                        >
+                          ↺
+                        </button>
+                      </div>
                       <input 
                         type="number" name={axis} value={controls[axis as keyof typeof controls]} onChange={handleInputChange}
-                        className="w-16 bg-black/60 border border-white/10 rounded px-2 py-1 text-xs font-mono text-center text-purple-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus:outline-none focus:border-purple-500"
+                        className="w-16 bg-black/60 border border-white/10 rounded px-2 py-1 text-xs font-mono text-center text-purple-400 focus:outline-none focus:border-purple-500"
                       />
                     </div>
-                    <input type="range" name={axis} min="-100" max="100" value={controls[axis as keyof typeof controls]} onChange={handleInputChange} className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500" />
+                    {/* Event onDoubleClick untuk reset cepat dari bar slider */}
+                    <input 
+                      type="range" name={axis} min="1100" max="1900" 
+                      value={controls[axis as keyof typeof controls]} 
+                      onChange={handleInputChange} 
+                      onDoubleClick={() => resetSingleAxis(axis as keyof typeof controls)}
+                      className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500" 
+                      title="Geser, atau klik ganda (double-click) untuk mereset"
+                    />
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* NEW: VEHICLE ACTIONS PANEL */}
+          {/* VEHICLE ACTIONS PANEL */}
           <div className="bg-[#111827] p-6 rounded-xl border border-white/5 flex flex-wrap gap-4">
             <button onClick={() => setLights(!lights)} className={`flex-1 py-3 rounded-lg font-bold text-[10px] uppercase border transition-all ${lights ? 'bg-yellow-500/20 border-yellow-500 text-yellow-500' : 'bg-slate-800 border-white/5 text-slate-500'}`}>
               💡 Lights {lights ? 'ON' : 'OFF'}
             </button>
             <div className="flex-[2] bg-slate-800/50 p-2 rounded-lg border border-white/5 flex items-center gap-4 px-4">
-              <span className="text-[10px] font-bold text-slate-400 uppercase">Gripper</span>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Gripper</span>
+                <button onClick={() => setGripper(0)} className="bg-slate-800 hover:bg-slate-700 text-slate-400 rounded px-1.5 py-0.5 text-[10px]">↺</button>
+              </div>
               <input type="range" min="0" max="100" value={gripper} onChange={(e) => setGripper(parseInt(e.target.value))} className="flex-1 h-1 bg-slate-700 rounded-lg appearance-none accent-white" />
               <span className="text-[10px] font-mono text-white">{gripper}%</span>
             </div>
-            <button onClick={() => setIsRecording(!isRecording)} className={`flex-1 py-3 rounded-lg font-bold text-[10px] uppercase border transition-all ${isRecording ? 'bg-red-500/20 border-red-500 text-red-500 animate-pulse' : 'bg-slate-800 border-white/5 text-slate-500'}`}>
-              ⏺ {isRecording ? 'Recording' : 'Record'}
-            </button>
           </div>
         </div>
 
         {/* PANEL KANAN: MONITORING */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-[#111827] p-5 rounded-xl border border-white/5">
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase mb-4 tracking-widest">Thruster Monitor</h3>
-            <div className="grid grid-cols-2 gap-3">
-              {['T1', 'T2', 'T3', 'T4', 'T5', 'T6'].map((id) => (
-                <div key={id} className="bg-black/40 p-3 rounded border border-white/5">
-                  <span className="text-[8px] font-bold text-slate-600 block">{id} MOTOR</span>
-                  <div className="text-lg font-light text-blue-400/80">0.0</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-black/60 p-5 rounded-xl border border-white/5 h-64 font-mono text-[9px] flex flex-col justify-between">
-             <div className="space-y-1">
-               <div className="text-blue-500/70 border-b border-white/10 pb-1 mb-2">SYSTEM_HEALTH</div>
-               <div className="flex justify-between text-slate-500"><span>CPU_TEMP:</span> <span className="text-white">42.5°C</span></div>
-               <div className="flex justify-between text-slate-500"><span>LATENCY:</span> <span className="text-green-500">12ms</span></div>
-               <div className="text-blue-500/70 border-b border-white/10 pb-1 mt-4 mb-2">CMD_VEL_OUT</div>
-               <div className="text-slate-400">lin: [{Number(controls.surge/100).toFixed(2)}, {Number(controls.sway/100).toFixed(2)}, {Number(controls.heave/100).toFixed(2)}]</div>
-               <div className="text-slate-400">ang: [{Number(controls.roll/100).toFixed(2)}, {Number(controls.pitch/100).toFixed(2)}, {Number(controls.yaw/100).toFixed(2)}]</div>
+          <div className="bg-black/60 p-5 rounded-xl border border-white/5 font-mono text-[10px] flex flex-col justify-between">
+             <div className="space-y-2">
+               <div className="text-blue-500/70 border-b border-white/10 pb-1 mb-3">TELEMETRY_DATA</div>
+               <div className="flex justify-between text-slate-500"><span>ROLL:</span> <span className="text-white">{telemetry.roll}°</span></div>
+               <div className="flex justify-between text-slate-500"><span>PITCH:</span> <span className="text-white">{telemetry.pitch}°</span></div>
+               <div className="flex justify-between text-slate-500"><span>YAW:</span> <span className="text-white">{telemetry.yaw}°</span></div>
+               
+               <div className="text-blue-500/70 border-b border-white/10 pb-1 mt-6 mb-3">ACTIVE_CHANNELS (PWM)</div>
+               <div className="text-slate-400">CH1 (Pitch): {controls.pitch}</div>
+               <div className="text-slate-400">CH2 (Roll) : {controls.roll}</div>
+               <div className="text-slate-400">CH3 (Vert) : {controls.vertical}</div>
+               <div className="text-slate-400">CH4 (Yaw)  : {controls.yaw}</div>
+               <div className="text-slate-400">CH5 (Fwd)  : {controls.forward}</div>
+               <div className="text-slate-400">CH6 (Lat)  : {controls.lateral}</div>
              </div>
-             {isLive && Object.values(controls).some(v => Number(v) !== 0) && (
-               <div className="text-green-500 animate-pulse flex items-center gap-2 font-bold mt-4">
-                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full shadow-[0_0_8px_#22c55e]"></span>
-                 STREAMING_TOPICS...
+
+             {isArmed && (
+               <div className="text-red-500 animate-pulse flex items-center gap-2 font-bold mt-6">
+                 <span className="w-2 h-2 bg-red-500 rounded-full shadow-[0_0_8px_#ef4444]"></span>
+                 MOTORS_ARMED & TRANSMITTING...
                </div>
              )}
           </div>
