@@ -9,7 +9,8 @@ import { Navbar } from './layouts/Navbar';
 import { Home } from './views/Home';
 import { Dashboard } from './views/Dashboard';
 import ParamsView from './views/params'; 
-import MissionControl from './views/Mission'; // IMPORT BARU
+import MissionControl from './views/Mission'; 
+import PingSonarView from './views/ping'; // Import sekarang akan berwarna terang
 
 // Import Types
 import { TelemetryData } from './types/telemetry';
@@ -77,10 +78,12 @@ function App() {
                 <Route path="/live" element={<Dashboard telemetry={telemetry} />} />
                 <Route path="/simulation" element={<Simulation />} /> 
                 <Route path="/params" element={<ParamsView />} /> 
-
-                {/* ROUTE MISSION CONTROL YANG BARU DITAMBAHKAN */}
                 <Route path="/mission" element={<MissionControl />} /> 
 
+                {/* ROUTE PING SONAR: Ini yang membuat card di Home bisa dibuka */}
+                <Route path="/ping" element={<PingSonarView />} /> 
+
+                {/* Placeholder untuk route yang belum memiliki view khusus */}
                 <Route path="/video" element={<div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">📹 Pengaturan Video Stream</div>} />
                 <Route path="/setup" element={<div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">⚙️ Kalibrasi Sensor & Motor</div>} />
 
