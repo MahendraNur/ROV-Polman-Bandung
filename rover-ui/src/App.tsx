@@ -9,8 +9,12 @@ import { Navbar } from './layouts/Navbar';
 import { Home } from './views/Home';
 import { Dashboard } from './views/Dashboard';
 import ParamsView from './views/params'; 
-import MissionControl from './views/Mission'; 
-import PingSonarView from './views/ping'; // Import sekarang akan berwarna terang
+import MissionControl from './views/Mission';
+import PingSonarView from './views/ping'; 
+
+// Import Views Baru untuk Log & Video
+import LogBrowser from './views/browser'; // Sesuaikan dengan nama file kamu
+import VideoStream from './views/video'; // Sesuaikan dengan nama file kamu
 
 // Import Types
 import { TelemetryData } from './types/telemetry';
@@ -31,7 +35,7 @@ function App() {
     roll: 0
   });
 
-  // Simulasi data sensor ROV
+  // Simulasi data sensor ROV untuk Polman Bandung
   useEffect(() => {
     const interval = setInterval(() => {
       setTelemetry(prev => ({
@@ -80,11 +84,14 @@ function App() {
                 <Route path="/params" element={<ParamsView />} /> 
                 <Route path="/mission" element={<MissionControl />} /> 
 
-                {/* ROUTE PING SONAR: Ini yang membuat card di Home bisa dibuka */}
+                {/* ROUTE PING SONAR */}
                 <Route path="/ping" element={<PingSonarView />} /> 
 
+                {/* UPDATE: Route untuk Log Browser & Video Stream */}
+                <Route path="/browser" element={<LogBrowser />} /> 
+                <Route path="/video" element={<VideoStream />} />
+
                 {/* Placeholder untuk route yang belum memiliki view khusus */}
-                <Route path="/video" element={<div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">📹 Pengaturan Video Stream</div>} />
                 <Route path="/setup" element={<div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">⚙️ Kalibrasi Sensor & Motor</div>} />
 
                 {/* Redirect jika route tidak ditemukan */}
@@ -93,7 +100,7 @@ function App() {
             </div>
           </main>
 
-          {/* Footer Identitas Kampus */}
+          {/* Footer Identitas Kampus Polman Bandung */}
           <footer className={`h-6 px-6 flex items-center justify-between text-[9px] font-mono border-t z-10 ${
             isDarkMode ? 'bg-[#111827]/90 border-white/10 text-slate-500' : 'bg-white/80 border-black/5 text-slate-600'
           }`}>

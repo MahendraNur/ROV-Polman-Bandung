@@ -1,94 +1,110 @@
 import React, { useState } from 'react';
-import { Eye, Radio, Settings2 } from 'lucide-react'; // Menggunakan lucide-react untuk icon
+import { Radio, Eye, Settings2, Info, Link as LinkIcon, Activity } from 'lucide-react';
 
-const PingSonarPage = () => {
+const PingSonarView = () => {
   const [mavlinkEnabled, setMavlinkEnabled] = useState(true);
 
   return (
-    <div className="p-8 bg-white text-slate-800 font-sans">
-      {/* Header Section */}
-      <h1 className="text-3xl font-bold text-[#1a5f96] flex items-center gap-2 mb-4">
-        <span className="text-slate-300">#</span> Ping Sonar Devices
-      </h1>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       
-      <p className="italic text-gray-600 mb-2">
-        <span className="font-bold">Based On:</span> <a href="#" className="text-blue-500 underline">Ping Service</a> | Port: 9110
-      </p>
-      
-      <p className="text-blue-500 text-sm mb-6">New in 1.1</p>
+      {/* Header Style Gazebo Simulation */}
+      <div className="flex items-center gap-5 mb-8">
+        <div className="p-4 bg-blue-600 rounded-2xl shadow-lg shadow-blue-500/20">
+          <Radio size={32} className="text-white" />
+        </div>
+        <div>
+          <h1 className="text-4xl font-black text-white tracking-tight uppercase">Ping Sonar Devices</h1>
+          <p className="text-slate-500 font-mono text-sm mt-1 tracking-widest uppercase">
+            Manage detected Ping family sonar devices
+          </p>
+        </div>
+      </div>
 
-      <p className="mb-4 leading-relaxed">
-        The Ping Sonar Devices page shows any detected <a href="#" className="text-blue-500 underline">sonars</a> from the Ping family, 
-        including <a href="#" className="text-blue-500 underline">ethernet-configured Ping360s</a> that are visible on the local network 
-        (e.g. via an <a href="#" className="text-blue-500 underline">Ethernet Switch</a>).
-      </p>
-
-      <ul className="list-disc ml-6 mb-8 space-y-2">
-        <li>Allows configuring Ping Sonar distance estimates to send as MAVLink <code className="text-blue-600 bg-blue-50 px-1 rounded text-sm font-mono">DISTANCE_SENSOR</code> messages to the autopilot, for viewing in the Control Station Software and logging as part of the telemetry stream</li>
-        <li>Provides a viewing utility for devices connected via USB/serial, to show which port they are plugged into</li>
-      </ul>
-
-      {/* Cards Container */}
-      <div className="bg-[#1e88e5] p-10 rounded-sm flex flex-wrap gap-6 justify-center">
-        
-        {/* Card Ping1D */}
-        <div className="bg-white w-[320px] rounded-sm shadow-lg overflow-hidden">
-          <div className="p-6 flex flex-col items-center border-b border-gray-100">
-             <Radio className="text-[#1e88e5] w-12 h-12 mb-2" />
-             <h2 className="text-xl text-gray-700">Ping1D</h2>
+      {/* Info Section - Dibuat lebih transparan agar menyatu */}
+      <div className="bg-[#111827]/40 border border-white/5 rounded-2xl p-6 mb-10 backdrop-blur-md max-w-5xl">
+        <div className="flex gap-4">
+          <div className="p-2 bg-blue-500/10 rounded-lg h-fit">
+            <Info className="text-blue-400" size={20} />
           </div>
-          <div className="p-4 space-y-3 text-sm">
-            <div className="flex justify-between border-b pb-2">
-              <span className="text-gray-600">Bridge</span>
-              <span className="font-mono text-gray-800">UDP 9090</span>
+          <div className="space-y-3">
+            <p className="text-slate-300 text-sm leading-relaxed">
+              The Ping Sonar Devices page shows any detected sonars from the Ping family, 
+              including ethernet-configured Ping360s visible on the local network.
+            </p>
+            <div className="flex items-center gap-4 text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+              <span>Based On: <span className="text-blue-400 underline cursor-pointer">Ping Service</span></span>
+              <span>|</span>
+              <span>Port: 9110</span>
+              <span className="bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 font-bold">New in 1.1</span>
             </div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="text-gray-600">MAVLink Distances</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid Container Tanpa Kotak Biru Besar */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
+        
+        {/* Card Ping1D - Dark Version */}
+        <div className="bg-[#111827]/60 border border-white/10 rounded-3xl overflow-hidden backdrop-blur-xl shadow-2xl hover:border-blue-500/50 transition-all duration-300 group">
+          <div className="p-8 flex flex-col items-center border-b border-white/5 bg-white/5">
+             <div className="p-4 bg-blue-600/10 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                <Radio className="text-blue-500 w-10 h-10" />
+             </div>
+             <h2 className="text-2xl font-black text-white tracking-tighter uppercase">Ping1D</h2>
+             <span className="text-[10px] font-mono text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full mt-2 animate-pulse">Connected</span>
+          </div>
+          
+          <div className="p-6 space-y-4">
+            <div className="flex justify-between items-center text-[11px] font-bold tracking-widest text-slate-500 uppercase">
+              <span>Bridge</span> <span className="font-mono text-blue-400">UDP 9090</span>
+            </div>
+            
+            <div className="flex justify-between items-center py-2">
+              <span className="text-[11px] font-bold tracking-widest text-slate-500 uppercase">MAVLink Distances</span>
               <button 
-                onClick={() => setMavlinkEnabled(!mavlinkEnabled)}
-                className={`w-12 h-6 rounded-full transition-colors relative ${mavlinkEnabled ? 'bg-blue-400' : 'bg-gray-300'}`}
+                onClick={() => setMavlinkEnabled(!mavlinkEnabled)} 
+                className={`w-12 h-6 rounded-full relative transition-all duration-300 ${mavlinkEnabled ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'bg-slate-700'}`}
               >
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${mavlinkEnabled ? 'left-7' : 'left-1'}`} />
+                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg transition-all duration-300 ${mavlinkEnabled ? 'left-7' : 'left-1'}`} />
               </button>
             </div>
-            <div className="flex justify-between border-b pb-2">
-              <span className="text-gray-600">FW</span>
-              <span className="text-gray-800">3.29.0</span>
-            </div>
-            <div className="flex justify-between border-b pb-2">
-              <span className="text-gray-600">ID</span>
-              <span className="text-gray-800">1</span>
-            </div>
-            <div className="flex justify-between border-b pb-2">
-              <span className="text-gray-600">Model</span>
-              <span className="text-gray-800">0</span>
-            </div>
-            <div className="flex justify-between border-b pb-2">
-              <span className="text-gray-600">Revision</span>
-              <span className="text-gray-800">1</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <div className="flex flex-col">
-                <span className="text-gray-600">Device</span>
-                <span className="text-gray-800 font-mono">/dev/ttyUSB0</span>
+
+            <div className="grid grid-cols-2 gap-4 py-2">
+              <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+                <p className="text-[9px] text-slate-500 uppercase font-bold mb-1">FW Version</p>
+                <p className="text-white font-mono font-bold">3.29.0</p>
               </div>
-              <Eye className="text-gray-400 w-5 h-5 cursor-pointer hover:text-blue-500" />
+              <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+                <p className="text-[9px] text-slate-500 uppercase font-bold mb-1">Device ID</p>
+                <p className="text-white font-mono font-bold">1</p>
+              </div>
             </div>
-          </div>
-          <div className="bg-gray-50 p-2 flex justify-center">
-            <span className="text-gray-400">^</span>
+
+            <div className="flex justify-between items-center bg-blue-600/10 p-4 rounded-2xl border border-blue-500/20 group-hover:bg-blue-600/20 transition-colors">
+              <div className="flex flex-col">
+                <span className="text-[9px] text-blue-400 uppercase font-black tracking-tighter">System Port</span>
+                <span className="font-mono text-white text-xs font-bold">/dev/ttyUSB0</span>
+              </div>
+              <Eye className="text-slate-500 group-hover:text-blue-400 w-5 h-5 cursor-pointer transition-colors" />
+            </div>
           </div>
         </div>
 
-        {/* Card Ping360 */}
-        <div className="bg-white w-[320px] h-fit rounded-sm shadow-lg overflow-hidden">
-          <div className="p-6 flex flex-col items-center border-b border-gray-100">
-             <Settings2 className="text-[#1e88e5] w-12 h-12 mb-2 rotate-90" />
-             <h2 className="text-xl text-gray-700">Ping360</h2>
+        {/* Card Ping360 - Dark Version */}
+        <div className="bg-[#111827]/60 border border-white/10 rounded-3xl overflow-hidden backdrop-blur-xl shadow-2xl hover:border-blue-500/50 transition-all duration-300 group">
+          <div className="p-8 flex flex-col items-center border-b border-white/5 bg-white/5">
+             <div className="p-4 bg-blue-600/10 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                <Settings2 className="text-blue-500 w-10 h-10 rotate-90" />
+             </div>
+             <h2 className="text-2xl font-black text-white tracking-tighter uppercase">Ping360</h2>
+             <span className="text-[10px] font-mono text-slate-500 bg-white/5 px-2 py-0.5 rounded-full mt-2 italic">Scanning...</span>
           </div>
-          <div className="p-4 flex justify-between text-sm">
-            <span className="text-gray-600">IP</span>
-            <span className="font-mono text-gray-800">192.168.2.4:12345</span>
+          <div className="p-6">
+            <p className="text-[10px] text-slate-500 uppercase font-bold mb-2 tracking-widest">Network Interface</p>
+            <div className="bg-blue-600/10 text-blue-400 font-mono text-sm p-4 rounded-2xl border border-blue-500/20 flex justify-between items-center">
+              <span>192.168.2.4:12345</span>
+              <Activity size={14} className="animate-pulse" />
+            </div>
           </div>
         </div>
 
@@ -97,4 +113,4 @@ const PingSonarPage = () => {
   );
 };
 
-export default PingSonarPage;
+export default PingSonarView;
