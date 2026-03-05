@@ -10,6 +10,12 @@ const menus = [
     icon: '🎮'
   },
   { 
+    path: '/manualros2', 
+    title: 'Manual Simulation ROS2', 
+    desc: 'Override and control vehicle movements within the Gazebo SITL environment manually.', 
+    icon: '🎮'
+  },
+  { 
     path: '/autonomous', 
     title: 'Autonomous Simulation', 
     desc: 'Goal planning and autonomous navigation system.', 

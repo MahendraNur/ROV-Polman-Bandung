@@ -8,7 +8,8 @@ import { Navbar } from './layouts/Navbar';
 // Import Views
 import { Home } from './views/Home';
 import { Dashboard } from './views/Dashboard';
-import { Manual } from './views/manual'; // Pastikan importnya benar
+import { Manual } from './views/manual';
+import ManualROS2 from './views/manualros2'; // 👈 IMPORT KOMPONEN ROS2 BARU
 import Autonomous from './views/autonomous';
 
 // Import Types
@@ -18,19 +19,20 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const ws = useRef<WebSocket | null>(null);
 
-  // State Terpusat (Global)
+  // State Terpusat (Global) untuk MAVLink (Bisa diabaikan saat pakai ROS2)
   const [telemetry, setTelemetry] = useState<TelemetryData>({
     depth: 0.0, heading: 0, voltage: 0.0, status: 'DISCONNECTED', mode: 'STABILIZE', pitch: 0, roll: 0
   });
   const [isArmed, setIsArmed] = useState(false);
 
-  // KONEKSI WEBSOCKET TERPUSAT
+  // KONEKSI WEBSOCKET TERPUSAT (Untuk MAVLink/FastAPI lama)
+  // Biarkan saja ini jalan, tidak akan mengganggu ROS2. Nanti statusnya hanya 'DISCONNECTED'
   useEffect(() => {
     const socket = new WebSocket('ws://127.0.0.1:8000/ws/telemetry');
     ws.current = socket;
 
     socket.onopen = () => {
-      console.log("✅ Berhasil terhubung ke WebSocket Backend");
+      console.log("✅ Berhasil terhubung ke WebSocket Backend MAVLink");
       setTelemetry(prev => ({ ...prev, status: 'CONNECTED' }));
     };
 
@@ -50,9 +52,9 @@ function App() {
       }
     };
 
-    socket.onerror = (error) => console.error("❌ Error WebSocket:", error);
+    socket.onerror = (error) => console.error("❌ Error WebSocket MAVLink:", error);
     socket.onclose = () => {
-      console.log("🔌 Koneksi WebSocket terputus");
+      console.log("🔌 Koneksi WebSocket MAVLink terputus");
       setTelemetry(prev => ({ ...prev, status: 'DISCONNECTED' }));
       setIsArmed(false);
     };
@@ -64,7 +66,7 @@ function App() {
     };
   }, []);
 
-  // FUNGSI KONTROL TERPUSAT (Untuk dikirim ke halaman Manual)
+  // FUNGSI KONTROL TERPUSAT (Untuk MAVLink)
   const toggleArm = () => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       const action = isArmed ? "disarm" : "arm";
@@ -98,7 +100,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/live" element={<Dashboard telemetry={telemetry} />} />
                 
-                {/* Halaman Manual sekarang menerima props */}
+                {/* Pintu 1: Manual MAVLink Lama */}
                 <Route path="/manual" element={
                   <div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">
                     <Manual 
@@ -109,15 +111,23 @@ function App() {
                     />
                   </div>
                 } />
+
+                {/* 👈 PINTU 2 BARU: Manual ROS2 Gazebo */}
+                <Route path="/manualros2" element={
+                  <div className="p-1 text-white">
+                    <ManualROS2 />
+                  </div>
+                } />
                 
                 <Route path="/autonomous" element={<div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">{<Autonomous />}</div>} />
-                {/* ... (Route lainnya dibiarkan sama) ... */}
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>
           </main>
 
-          <footer className={`... (Footer sama seperti sebelumnya) ...`}>
+          <footer className={`h-6 px-6 flex items-center justify-between text-[9px] font-mono border-t z-10 ${
+            isDarkMode ? 'bg-[#111827]/90 border-white/10 text-slate-500' : 'bg-white/80 border-black/5 text-slate-600'
+          }`}>
             <span className="tracking-widest uppercase">Politeknik Manufaktur Bandung - TRIN</span>
             <span className="font-bold">SYSTEM_STABLE_v1.0.4</span>
           </footer>
