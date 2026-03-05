@@ -15,8 +15,7 @@ import { TelemetryData } from './types/telemetry';
 // Import Views Simulation
 import Simulation from './views/simulation';
 
-import VehicleSetup from './views/VehicleSetup';
-
+import VehicleSetup from './views/VehicleSetup/index';
 function App() {
   // State untuk Mode Siang/Malam
   const [isDarkMode, setIsDarkMode] = useState(true);
