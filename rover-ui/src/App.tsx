@@ -17,6 +17,9 @@ import PingSonarView from './views/ping';
 import LogBrowser from './views/browser'; 
 import VideoStream from './views/video'; 
 
+// Import Views Tambahan (Hasil Merge)
+import VehicleSetup from './views/VehicleSetup/index';
+
 // Import Types
 import { TelemetryData } from './types/telemetry';
 
@@ -141,19 +144,12 @@ function App() {
                   </div>
                 } />
 
-                {/* Modul Tambahan dari Branch Remote */}
                 <Route path="/params" element={<ParamsView />} /> 
                 <Route path="/mission" element={<MissionControl />} /> 
                 <Route path="/ping" element={<PingSonarView />} /> 
                 <Route path="/browser" element={<LogBrowser />} /> 
                 <Route path="/video" element={<VideoStream />} />
-
-                {/* Placeholder untuk route setup */}
-                <Route path="/setup" element={
-                  <div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">
-                    ⚙️ Kalibrasi Sensor & Motor
-                  </div>
-                } />
+                <Route path="/setup" element={<VehicleSetup />} />
 
                 {/* Redirect jika route tidak ditemukan */}
                 <Route path="*" element={<Navigate to="/" />} />
