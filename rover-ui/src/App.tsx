@@ -11,14 +11,15 @@ import { Dashboard } from './views/Dashboard';
 import ParamsView from './views/params'; 
 import MissionControl from './views/Mission';
 import PingSonarView from './views/ping'; 
-import LogBrowser from './views/browser'; // Sesuaikan dengan nama file kamu
-import VideoStream from './views/video'; // Sesuaikan dengan nama file kamu
+import LogBrowser from './views/browser';
+import VideoStream from './views/video';
+import Simulation from './views/simulation';
+
+// Import View Baru: Dokumentasi Tim
+import { Team }  from './views/kami'; 
 
 // Import Types
 import { TelemetryData } from './types/telemetry';
-
-// Import Views Simulation
-import Simulation from './views/simulation';
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -55,14 +56,14 @@ function App() {
         isDarkMode ? 'bg-[#0b111a] text-slate-200' : 'bg-slate-50 text-slate-900'
       }`}>
         
-        {/* Sidebar tetap di kiri */}
+        {/* Sidebar Navigasi */}
         <Sidebar isDarkMode={isDarkMode} />
 
         <div className={`flex-1 flex flex-col h-full relative transition-colors duration-300 ${
           isDarkMode ? 'bg-[#1e4e8c]' : 'bg-blue-500'
         }`}>
           
-          {/* Background dots aksen untuk Ground Station */}
+          {/* Background Aksen Ground Station */}
           <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:30px_30px] z-0"></div>
 
           {/* Navbar Global */}
@@ -81,15 +82,13 @@ function App() {
                 <Route path="/simulation" element={<Simulation />} /> 
                 <Route path="/params" element={<ParamsView />} /> 
                 <Route path="/mission" element={<MissionControl />} /> 
-
-                {/* ROUTE PING SONAR */}
                 <Route path="/ping" element={<PingSonarView />} /> 
-
-                {/* UPDATE: Route untuk Log Browser & Video Stream */}
                 <Route path="/browser" element={<LogBrowser />} /> 
                 <Route path="/video" element={<VideoStream />} />
 
-                {/* Placeholder untuk route yang belum memiliki view khusus */}
+                {/* ROUTE DOKUMENTASI TIM */}
+                <Route path="/kami" element={<Team />} /> 
+
                 <Route path="/setup" element={<div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">⚙️ Kalibrasi Sensor & Motor</div>} />
 
                 {/* Redirect jika route tidak ditemukan */}
@@ -98,7 +97,7 @@ function App() {
             </div>
           </main>
 
-          {/* Footer Identitas Kampus Polman Bandung */}
+          {/* Footer Identitas Kampus */}
           <footer className={`h-6 px-6 flex items-center justify-between text-[9px] font-mono border-t z-10 ${
             isDarkMode ? 'bg-[#111827]/90 border-white/10 text-slate-500' : 'bg-white/80 border-black/5 text-slate-600'
           }`}>
