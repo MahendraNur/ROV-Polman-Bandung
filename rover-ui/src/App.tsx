@@ -16,6 +16,8 @@ import { TelemetryData } from './types/telemetry';
 import Simulation from './views/simulation';
 
 import VehicleSetup from './views/VehicleSetup/index';
+
+import { SystemInformation } from './views/SystemInformation';
 function App() {
   // State untuk Mode Siang/Malam
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -96,6 +98,7 @@ function App() {
                 <Route path="/setup" element={<VehicleSetup />} />
                 {/* Fallback: Jika user mengetik alamat asal, lempar kembali ke Home */}
                 <Route path="*" element={<Navigate to="/" />} />
+                <Route path="/system-info" element={<SystemInformation />} />
               </Routes>
             </div>
           </main>
