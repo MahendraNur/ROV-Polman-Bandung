@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 // @ts-ignore
 import rovBgImage from '../../assets/rov-bg.jpg';
 
-// 1. Tentukan Struktur Data (Type Interface) agar TypeScript mengerti
+// 1. Tentukan Struktur Data (Type Interface)
 interface Member {
   id: number;
   initials: string;
@@ -79,62 +79,25 @@ interface AvatarProps {
 
 const Avatar = ({ initials, src }: AvatarProps) => (
   <div style={{
-    width: 50, height: 50, borderRadius: 12,
-    background: 'linear-gradient(135deg,#1e4a8a,#2a6ec0)',
-    border: '2px solid #162848',
-    outline: '3px solid rgba(74,184,240,0.2)',
+    width: 64, height: 64, borderRadius: 16,
+    background: 'linear-gradient(135deg, rgba(30,58,138,0.8), rgba(42,110,192,0.8))',
+    border: '2px solid rgba(74,184,240,0.4)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: 14, fontWeight: 700, color: '#4ab8f0',
+    fontSize: 20, fontWeight: 800, color: '#fff',
     fontFamily: "'JetBrains Mono', monospace",
     overflow: 'hidden', flexShrink: 0,
+    boxShadow: '0 4px 12px rgba(74,184,240,0.2)'
   }}>
-    {src ? <img src={src} alt={initials} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10 }} /> : initials}
+    {src ? <img src={src} alt={initials} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
   </div>
 );
 
-/* ─── InfoBox Component ─── */
-interface InfoBoxProps {
-  label: string;
-  value: string;
-  wide?: boolean;
-}
-
-const InfoBox = ({ label, value, wide }: InfoBoxProps) => (
-  <div style={{
-    background: '#1a3058',
-    border: '1px solid rgba(100,160,255,0.18)',
-    borderRadius: 8, padding: '8px 10px',
-    gridColumn: wide ? 'span 2' : undefined,
-  }}>
-    <div style={{ 
-      fontFamily: "'JetBrains Mono', monospace", 
-      fontSize: '8.5px', 
-      letterSpacing: 2, 
-      textTransform: 'uppercase', 
-      color: '#3d6a90', 
-      marginBottom: 3 
-    }}>
-      {label}
-    </div>
-    <div style={{ 
-      fontSize: '12px', 
-      color: '#7aaacf', 
-      fontWeight: 500, 
-      lineHeight: 1.3 
-    }}>
-      {value}
-    </div>
-  </div>
-);
-
-/* ─── MemberCard Component ─── */
+/* ─── Modern MemberCard Component ─── */
 interface MemberCardProps {
   member: Member;
-  index: number;
-  total: number;
 }
 
-const MemberCard = ({ member, index, total }: MemberCardProps) => {
+const MemberCard = ({ member }: MemberCardProps) => {
   const [hovered, setHovered] = useState(false);
   
   return (
@@ -142,68 +105,78 @@ const MemberCard = ({ member, index, total }: MemberCardProps) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: '#162848',
-        border: `1px solid ${hovered ? 'rgba(100,180,255,0.5)' : 'rgba(100,160,255,0.18)'}`,
-        borderRadius: 14, overflow: 'hidden', position: 'relative', cursor: 'pointer',
-        transform: hovered ? 'translateY(-5px)' : 'translateY(0)',
-        boxShadow: hovered ? '0 16px 48px rgba(0,0,0,0.45), 0 0 0 1px rgba(74,184,240,0.1)' : 'none',
-        transition: 'transform .3s, box-shadow .3s, border-color .3s',
+        width: '340px', // Lebar seragam
+        flexGrow: 1, 
+        maxWidth: '380px',
+        background: hovered ? 'rgba(22, 40, 72, 0.9)' : 'rgba(15, 23, 42, 0.65)',
+        backdropFilter: 'blur(12px)',
+        border: `1px solid ${hovered ? 'rgba(74,184,240,0.5)' : 'rgba(100,160,255,0.15)'}`,
+        borderRadius: 20,
+        padding: '24px',
+        display: 'flex', flexDirection: 'column', gap: '16px',
+        transform: hovered ? 'translateY(-6px)' : 'translateY(0)',
+        boxShadow: hovered ? '0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(74,184,240,0.2)' : '0 4px 20px rgba(0,0,0,0.2)',
+        transition: 'all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)',
+        cursor: 'pointer',
+        position: 'relative',
+        overflow: 'hidden'
       }}
     >
-      {/* Card number */}
+      {/* Background Glow Effect */}
       <div style={{
-        position: 'absolute', top: 10, right: 12, zIndex: 5,
-        fontFamily: "'JetBrains Mono',monospace", fontSize: 9,
-        color: 'rgba(255,255,255,0.18)', letterSpacing: 1,
-      }}>
-        {String(index + 1).padStart(2, '0')}/{String(total).padStart(2, '0')}
-      </div>
+        position: 'absolute', top: '-50px', right: '-50px', width: '100px', height: '100px',
+        background: hovered ? 'radial-gradient(circle, rgba(74,184,240,0.15) 0%, transparent 70%)' : 'transparent',
+        transition: 'background 0.4s ease', borderRadius: '50%'
+      }} />
 
-      {/* Photo banner */}
-      <div style={{ height: 105, background: 'linear-gradient(160deg,#1a3a6e,#0f2245)', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(-45deg,transparent,transparent 18px,rgba(74,184,240,0.025) 18px,rgba(74,184,240,0.025) 19px)' }} />
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'JetBrains Mono',monospace", fontSize: 26, fontWeight: 600, color: 'rgba(74,184,240,0.18)', userSelect: 'none' }}>
-          {member.initials}
+      {/* Header: Avatar + Info */}
+      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+        <div style={{ position: 'relative' }}>
+          <Avatar initials={member.initials} />
+          {/* Status Indicator */}
+          <div style={{ position: 'absolute', bottom: -2, right: -2, width: 14, height: 14, borderRadius: '50%', background: '#3dd68c', border: '3px solid #0f172a', animation: 'blink 2.5s infinite' }} />
         </div>
-        <div style={{ position: 'absolute', bottom: -24, left: 20, zIndex: 10 }}>
-          <div style={{ position: 'relative' }}>
-            <Avatar initials={member.initials} />
-            <div style={{ position: 'absolute', bottom: -2, right: -2, width: 11, height: 11, borderRadius: '50%', background: '#3dd68c', border: '2px solid #162848', boxShadow: '0 0 7px rgba(61,214,140,.7)', animation: 'blink 2.5s infinite' }} />
-          </div>
-        </div>
-      </div>
-
-      {/* Card body */}
-      <div style={{ padding: '32px 18px 18px' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 6, marginBottom: 5 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#ddeeff', letterSpacing: '.3px' }}>
-            {member.name}
-          </div>
-          <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 9, color: '#3d6a90', letterSpacing: 1, paddingTop: 2, whiteSpace: 'nowrap' }}>
+        
+        <div style={{ flex: 1 }}>
+          <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '10px', color: '#6ea8fe', letterSpacing: '1px', marginBottom: '4px' }}>
             {member.uid}
           </div>
+          <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.2, marginBottom: '4px' }}>
+            {member.name}
+          </div>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: '#4ab8f0', display: 'inline-block', background: 'rgba(74,184,240,0.1)', padding: '2px 8px', borderRadius: '6px' }}>
+            {member.role}
+          </div>
         </div>
+      </div>
 
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '10.5px', fontWeight: 600, color: '#4ab8f0', background: 'rgba(74,184,240,0.12)', border: '1px solid rgba(74,184,240,0.22)', borderRadius: 6, padding: '4px 10px', marginBottom: 14 }}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#4ab8f0', flexShrink: 0 }} />
-          {member.role}
+      <div style={{ height: '1px', background: 'linear-gradient(90deg, rgba(255,255,255,0.1), transparent)' }} />
+
+      {/* Program Studi & Divisi (Grid Ringkas) */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <div>
+          <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '9px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px' }}>Divisi</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: '#cbd5e1' }}>{member.divisi}</div>
         </div>
-
-        <div style={{ height: 1, background: 'linear-gradient(90deg,rgba(100,160,255,0.18),transparent)', marginBottom: 13 }} />
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
-          <InfoBox label="Program Studi" value={member.prodi} wide />
-          <InfoBox label="Divisi" value={member.divisi} />
-          <InfoBox label="Tanggung Jawab" value={member.tanggung_jawab} wide />
+        <div>
+          <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '9px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px' }}>Program Studi</div>
+          <div style={{ fontSize: '12px', fontWeight: 500, color: '#94a3b8', lineHeight: 1.3 }}>{member.prodi}</div>
         </div>
+      </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-          {member.tags.map((tag: string) => (
-            <span key={tag} style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 9, padding: '3px 8px', borderRadius: 5, background: 'rgba(110,168,254,0.08)', border: '1px solid rgba(110,168,254,0.2)', color: '#6ea8fe', letterSpacing: '.3px' }}>
-              {tag}
-            </span>
-          ))}
-        </div>
+      {/* Tanggung Jawab Box */}
+      <div style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '10px', padding: '12px' }}>
+        <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '9px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Tanggung Jawab</div>
+        <div style={{ fontSize: '12.5px', color: '#e2e8f0', lineHeight: 1.4 }}>{member.tanggung_jawab}</div>
+      </div>
+
+      {/* Tags (Selalu di bawah) */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: 'auto' }}>
+        {member.tags.map((tag: string) => (
+          <span key={tag} style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '9.5px', padding: '4px 10px', borderRadius: '6px', background: 'rgba(110,168,254,0.05)', border: '1px solid rgba(110,168,254,0.2)', color: '#6ea8fe' }}>
+            {tag}
+          </span>
+        ))}
       </div>
     </div>
   );
@@ -211,57 +184,21 @@ const MemberCard = ({ member, index, total }: MemberCardProps) => {
 
 /* ─── Main Page Export ─── */
 export const Team = () => {
-  const row1 = MEMBERS.slice(0, 3);
-  const row2 = MEMBERS.slice(3);
-
   return (
     <div style={{ fontFamily: "'Exo 2', sans-serif", color: '#ddeeff' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,600;0,700;0,800;0,900;1,800&family=JetBrains+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,600;0,700;0,800;0,900;1,800&family=JetBrains+Mono:wght@400;500;700&display=swap');
         @keyframes slideUp { from { opacity:0; transform:translateY(28px) } to { opacity:1; transform:translateY(0) } }
         @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
-        @keyframes blink   { 0%,100% { opacity:1 } 50% { opacity:.3 } }
-        @keyframes cardUp  { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes blink   { 0%,100% { opacity:1; box-shadow: 0 0 8px rgba(61,214,140,0.6); } 50% { opacity:.5; box-shadow: none; } }
       `}</style>
 
-      {/* ── HERO DENGAN IMAGE SANDWICH ── */}
+      {/* ── HERO DENGAN IMAGE SANDWICH (Tetap Sama) ── */}
       <div style={{ position: 'relative', overflow: 'hidden', minHeight: '88vh', display: 'flex', alignItems: 'center', borderRadius: '20px', marginBottom: '20px' }}>
-        
-        {/* 1. LAYER PALING BAWAH: GAMBAR LOKAL */}
-        <img 
-          src={rovBgImage} 
-          alt="ROV Underwater" 
-          style={{ 
-            position: 'absolute', 
-            inset: 0, 
-            width: '100%', 
-            height: '100%', 
-            objectFit: 'cover', 
-            objectPosition: 'center',
-            zIndex: 1
-          }} 
-        />
-        
-        {/* 2. LAYER TENGAH: GRADIENT OVERLAY (Gelap di kiri, transparan di kanan) */}
-        <div style={{ 
-          position: 'absolute', 
-          inset: 0, 
-          background: 'linear-gradient(to right, rgba(10, 20, 45, 1) 0%, rgba(10, 20, 45, 0.8) 40%, transparent 100%)',
-          zIndex: 1
-        }} />
-        
-        {/* Opsional: Efek Titik-titik (Dot Grid) agar lebih futuristik */}
-        <div style={{ 
-          position: 'absolute', 
-          inset: 0, 
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)', 
-          backgroundSize: '28px 28px', 
-          WebkitMaskImage: 'linear-gradient(to right, black 40%, transparent 100%)', 
-          maskImage: 'linear-gradient(to right, black 40%, transparent 100%)',
-          zIndex: 1
-        }} />
+        <img src={rovBgImage} alt="ROV Underwater" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', zIndex: 1 }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(10, 20, 45, 1) 0%, rgba(10, 20, 45, 0.8) 40%, transparent 100%)', zIndex: 1 }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '28px 28px', maskImage: 'linear-gradient(to right, black 40%, transparent 100%)', zIndex: 1 }} />
 
-        {/* 3. LAYER PALING ATAS: KONTEN TEKS */}
         <div style={{ position: 'relative', zIndex: 2, padding: '80px 72px', maxWidth: 620 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontFamily: "'JetBrains Mono',monospace", fontSize: 10, letterSpacing: 3, textTransform: 'uppercase', color: '#4ab8f0', marginBottom: 20, animation: 'fadeIn .5s ease both .2s' }}>
             <span style={{ width: 28, height: 1.5, background: '#4ab8f0', borderRadius: 2, display: 'inline-block' }} />
@@ -269,8 +206,7 @@ export const Team = () => {
           </div>
 
           <h1 style={{ fontSize: 'clamp(38px, 4.8vw, 62px)', fontWeight: 900, lineHeight: 1.06, letterSpacing: -1, color: '#fff', marginBottom: 20, animation: 'slideUp .65s cubic-bezier(.22,.68,0,1) both .25s' }}>
-            Tim di Balik<br />
-            <em style={{ fontStyle: 'italic', color: '#4ab8f0' }}>ROV</em> Kami
+            Tim di Balik<br /><em style={{ fontStyle: 'italic', color: '#4ab8f0' }}>ROV</em> Kami
           </h1>
 
           <p style={{ fontSize: 14, color: '#7aaacf', lineHeight: 1.75, maxWidth: 430, marginBottom: 36, animation: 'fadeIn .6s ease both .4s' }}>
@@ -283,9 +219,7 @@ export const Team = () => {
                 <div style={{ fontSize: 34, fontWeight: 800, color: '#fff', lineHeight: 1, letterSpacing: -1 }}>
                   {num}<span style={{ color: '#4ab8f0' }}>{plus}</span>
                 </div>
-                <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: '#3d6a90', marginTop: 5 }}>
-                  {lbl}
-                </div>
+                <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', color: '#3d6a90', marginTop: 5 }}>{lbl}</div>
               </div>
             ))}
           </div>
@@ -298,7 +232,7 @@ export const Team = () => {
       </div>
 
       {/* ── SECTION HEADER ── */}
-      <div id="team-section" style={{ padding: '40px 72px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(100,160,255,0.18)', marginBottom: 32 }}>
+      <div id="team-section" style={{ padding: '40px 72px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(100,160,255,0.18)', marginBottom: 40 }}>
         <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: 2.5, textTransform: 'uppercase' }}>
           ANGGOTA <span style={{ color: '#4ab8f0' }}>TIM</span>
         </div>
@@ -307,13 +241,19 @@ export const Team = () => {
         </div>
       </div>
 
-      {/* ── CARDS ── */}
-      <div style={{ padding: '0 72px 72px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 18, maxWidth: 1000 }}>
-          {row1.map((m, i) => <MemberCard key={m.id} member={m} index={i} total={MEMBERS.length} />)}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 18, maxWidth: 'calc(66.66% + 6px)', margin: '18px auto 0' }}>
-          {row2.map((m, i) => <MemberCard key={m.id} member={m} index={i + 3} total={MEMBERS.length} />)}
+      {/* ── NEW BALANCED GRID LAYOUT ── */}
+      <div style={{ padding: '0 72px 80px' }}>
+        <div style={{ 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          justifyContent: 'center', 
+          gap: '24px', 
+          maxWidth: '1200px', 
+          margin: '0 auto' 
+        }}>
+          {MEMBERS.map((m) => (
+            <MemberCard key={m.id} member={m} />
+          ))}
         </div>
       </div>
     </div>
