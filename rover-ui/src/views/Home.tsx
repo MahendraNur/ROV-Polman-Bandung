@@ -1,46 +1,51 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+// Pastikan path ke MenuCard ini sesuai dengan folder kamu
 import { MenuCard } from '../components/MenuCard';
 
 const menus = [
   { 
     path: '/manual', 
-    title: 'Manual Simulation', 
-    desc: 'Override and control vehicle movements within the Gazebo SITL environment manually.', 
+    title: 'Manual Simulation (MAVLink)', 
+    desc: 'Override and control vehicle movements via ArduSub SITL.', 
     icon: '🎮'
   },
   { 
     path: '/manualros2', 
-    title: 'Manual Simulation ROS2', 
-    desc: 'Override and control vehicle movements within the Gazebo SITL environment manually.', 
-    icon: '🎮'
+    title: 'Manual Simulation (ROS 2)', 
+    desc: 'Direct Thruster Control Matrix within Gazebo ROS 2 environment.', 
+    icon: '⚙️'
   },
   { 
     path: '/autonomous', 
     title: 'Autonomous Simulation', 
-    desc: 'Goal planning and autonomous navigation system.', 
+    desc: 'Goal planning and autonomous navigation system (Nav2).', 
     icon: '🤖'
   },
   { 
     path: '/params',   
     title: 'Autopilot Parameters',
     desc: 'Modify vehicle parameters in real-time.', 
-    icon: '📑' },
+    icon: '📑' 
+  },
   { 
     path: '/live',     
     title: 'Live Telemetry',      
     desc: 'Real-time sensor data and video stream.', 
-    icon: '📊' },
+    icon: '📊' 
+  },
   { 
     path: '/video',    
     title: 'Video Streams',       
-    desc: 'Configure all video input devices.',      
-    icon: '📹' },
+    desc: 'Configure all video input devices.',       
+    icon: '📹' 
+  },
   { 
     path: '/setup',    
     title: 'Vehicle Setup',       
     desc: 'Sensor calibrations and motor tests.',    
-    icon: '⚙️' },
+    icon: '🔧' 
+  },
 ];
 
 export const Home: React.FC = () => {
@@ -59,10 +64,12 @@ export const Home: React.FC = () => {
             icon={m.icon} 
             title={m.title} 
             description={m.desc} 
-            onClick={() => navigate(m.path)} // Pindah ke alamat path
+            onClick={() => navigate(m.path)}
           />
         ))}
       </div>
     </div>
   );
 };
+
+export default Home;
