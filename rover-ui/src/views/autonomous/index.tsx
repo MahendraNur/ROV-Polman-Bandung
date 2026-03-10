@@ -10,20 +10,18 @@ export const Autonomous: React.FC = () => {
 
   const mapRef = useRef<HTMLDivElement>(null);
   
-  // KITA PAKAI NATIVE WEBSOCKET (Sama persis kaya tes Console!)
+  // KITA PAKAI NATIVE WEBSOCKET
   const wsRef = useRef<WebSocket | null>(null);
   const publishIntervalRef = useRef<number | null>(null);
 
   // --- 1. INISIALISASI KONEKSI WEBSOCKET MURNI ---
   useEffect(() => {
-    // Buka koneksi langsung ke ROSbridge
     const ws = new WebSocket('ws://localhost:9090');
 
     ws.onopen = () => {
       console.log('✅ Pintu ROSbridge Terbuka (Native)!');
       setIsConnected(true);
 
-      // Langsung kirim surat izin (Advertise) PoseStamped
       const advertiseMsg = {
         op: 'advertise',
         topic: '/xr_rov/cmd_pose',
@@ -43,7 +41,6 @@ export const Autonomous: React.FC = () => {
       setIsConnected(false);
     };
 
-    // Simpan ke referensi agar bisa dipakai fungsi startMission
     wsRef.current = ws;
 
     return () => {
@@ -96,7 +93,6 @@ export const Autonomous: React.FC = () => {
     publishIntervalRef.current = window.setInterval(() => {
       const currentGoal = goals[0]; 
 
-      // Format payload 100% sama dengan tes Console yang berhasil
       const payload = {
         op: 'publish',
         topic: '/xr_rov/cmd_pose',
@@ -116,8 +112,9 @@ export const Autonomous: React.FC = () => {
         }
       };
 
-      // Tembak data langsung (pasti tembus karena ga ada roslib yang ngehalangin)
-      if (wsRef.current.readyState === WebSocket.OPEN) {
+      // PERBAIKAN ERROR TYPESCRIPT ADA DI SINI:
+      // Kita pastikan wsRef.current TIDAK null dulu, baru kita panggil propertinya
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
         wsRef.current.send(JSON.stringify(payload));
       }
       
