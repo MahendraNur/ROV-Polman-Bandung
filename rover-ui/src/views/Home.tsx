@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 // Pastikan path ke MenuCard ini sesuai dengan folder kamu
 import { MenuCard } from '../components/MenuCard';
 
-// Gabungan menu yang sudah DIBERSIHKAN dari duplikat hasil merge
+// Gabungan menu yang sudah DIBERSIHKAN dari duplikat hasil merge Mahen & Hamiya
 const menus = [
   // 🎮 KELOMPOK SIMULASI & KONTROL
   { 
@@ -25,7 +25,7 @@ const menus = [
     icon: '🛰️'
   },
   { 
-    path: '/mission', // Ubah huruf kecil agar sesuai dengan App.tsx
+    path: '/mission', 
     title: 'Mission Control', 
     desc: 'Create, manage, and execute navigation missions with real-time updates.', 
     icon: '🎯' 
@@ -41,13 +41,13 @@ const menus = [
   { 
     path: '/video',    
     title: 'Video Streams',       
-    desc: 'Configure all video input devices.',       
-    icon: '📹' 
+    desc: 'Manage your video devices and video streams.', // Deskripsi dari Hamiya 
+    icon: '🎥' // Ikon dari Hamiya
   },
   { 
     path: '/ping',       
     title: 'Ping Sonar Devices',   
-    desc: 'Manage detected Ping family sonar devices.', 
+    desc: 'Manage detected Ping family sonar devices connected to the network.', // Gabungan deskripsi
     icon: '📡' 
   },
 
@@ -56,7 +56,7 @@ const menus = [
     path: '/setup',    
     title: 'Vehicle Setup',       
     desc: 'Sensor calibrations and motor tests.',    
-    icon: '🔧' // Pakai icon kunci inggris agar beda dengan ROS 2
+    icon: '🔧' 
   },
   { 
     path: '/params',   
@@ -73,7 +73,7 @@ const menus = [
   { 
     path: '/browser',    
     title: 'Log Browser',          
-    desc: 'Browse Telemetry (.tlog) and Binary (.bin) logs.', 
+    desc: 'Allow browsing the Telemetry (.tlog) and Binary (.bin) logs.', // Deskripsi dari Hamiya
     icon: '📁' 
   },
   { 
@@ -87,6 +87,14 @@ const menus = [
     title: 'BlueOS Version',      
     desc: 'Manage system firmware and updates.', 
     icon: '📦' 
+  },
+
+  // 👥 KELOMPOK INFORMASI TIM (Tambahan dari Hamiya)
+  { 
+    path: '/kami',      
+    title: 'Dokumentasi Team',      
+    desc: 'Informasi dan dokumentasi tentang tim pengembang.', 
+    icon: '👥' // Saya ganti ikonnya jadi gambar orang agar lebih pas dari sebelumnya (🎥)
   },
 ];
 

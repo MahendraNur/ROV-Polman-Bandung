@@ -25,8 +25,7 @@ import VehicleSetup from './views/VehicleSetup/index';
 // ✅ IMPORT HASIL KERJA NAUU (Simulation, SysInfo, BlueOS)
 import { SystemInformation } from './views/SystemInformation';
 import BlueOSVersion from './views/BlueOSVersion';
-
-// Import Types
+import { Team }  from './views/kami'; 
 import { TelemetryData } from './types/telemetry';
 
 function App() {
@@ -103,14 +102,15 @@ function App() {
         isDarkMode ? 'bg-[#0b111a] text-slate-200' : 'bg-slate-50 text-slate-900'
       }`}>
         
-        {/* Sidebar tetap di kiri */}
+        {/* Sidebar Navigasi */}
         <Sidebar isDarkMode={isDarkMode} />
 
         <div className={`flex-1 flex flex-col h-full relative transition-colors duration-300 ${
           isDarkMode ? 'bg-[#1e4e8c]' : 'bg-blue-500'
         }`}>
-          
+
           {/* Background Pattern */}
+          {/* Background Aksen Ground Station */}
           <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:30px_30px] z-0"></div>
 
           {/* Navbar Global */}
@@ -169,14 +169,18 @@ function App() {
                     <BlueOSVersion />
                   </div>
                 } />
+                {/* ROUTE DOKUMENTASI TIM */}
+                <Route path="/kami" element={<Team />} /> 
 
-                {/* Redirect jika route tidak ditemukan. PASTIKAN INI SELALU DI PALING BAWAH! */}
+                <Route path="/setup" element={<div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">⚙️ Kalibrasi Sensor & Motor</div>} />
+
+                {/* Redirect jika route tidak ditemukan */}
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>
           </main>
 
-          {/* Footer Identitas Kampus Polman Bandung */}
+          {/* Footer Identitas Kampus */}
           <footer className={`h-6 px-6 flex items-center justify-between text-[9px] font-mono border-t z-10 ${
             isDarkMode ? 'bg-[#111827]/90 border-white/10 text-slate-500' : 'bg-white/80 border-black/5 text-slate-600'
           }`}>
