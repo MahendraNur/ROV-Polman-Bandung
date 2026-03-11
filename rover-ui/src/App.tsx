@@ -1,19 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-
 // Import Layouts
 import { Sidebar } from './layouts/Sidebar';
 import { Navbar } from './layouts/Navbar';
 
-// Import Views
+// Import Views & Pages
 import { Home } from './views/Home';
 import { Dashboard } from './views/Dashboard';
 import { Manual } from './views/manual';
-import ManualROS2 from './pages/manualros2';
-import Autonomous from './views/autonomous';
+import ManualROS2 from './pages/manualros2'; // Kalau importmu error, pastikan case sensitivity hurufnya benar (misal: ManualROS2.tsx)
+import AutonomousROS2 from './pages/AutonomousROS2'; // <--- IMPORT HALAMAN BARU KITA
 
-// Import Types (Pastikan file types/telemetry.ts kamu sudah ada)
+// Import Types
 import { TelemetryData } from './types/telemetry';
 
 function App() {
@@ -51,7 +50,7 @@ function App() {
           }));
         }
       } catch (err) {
-        // Abaikan error parse JSON agar tidak memenuhi console
+        // Abaikan error
       }
     };
 
@@ -118,17 +117,17 @@ function App() {
                   </div>
                 } />
 
-                {/* Rute Manual ROS 2 Gazebo (Baru) */}
+                {/* Rute Manual ROS 2 Gazebo */}
                 <Route path="/manualros2" element={
                   <div className="p-1 text-white">
                     <ManualROS2 />
                   </div>
                 } />
                 
-                {/* Rute Autonomous */}
+                {/* Rute Autonomous ROS 2 (BARU) */}
                 <Route path="/autonomous" element={
-                  <div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">
-                    <Autonomous />
+                  <div className="p-1 text-white">
+                    <AutonomousROS2 />
                   </div>
                 } />
                 

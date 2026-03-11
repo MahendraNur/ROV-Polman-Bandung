@@ -18,9 +18,9 @@ const menus = [
   },
   { 
     path: '/autonomous', 
-    title: 'Autonomous Simulation', 
-    desc: 'Goal planning and autonomous navigation system (Nav2).', 
-    icon: '🤖'
+    title: 'Autonomous Simulation (ROS 2)', 
+    desc: 'Point & Go tactical navigation map via ROS 2 Bridge.', 
+    icon: '🛰️'
   },
   { 
     path: '/params',   
