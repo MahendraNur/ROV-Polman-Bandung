@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Import Layouts
-import { Sidebar } from './layouts/Sidebar';
+import  Sidebar  from './layouts/Sidebar';
 import { Navbar } from './layouts/Navbar';
 
 // Import Views
@@ -64,11 +64,10 @@ function App() {
       <div className={`flex h-screen w-full overflow-hidden transition-colors duration-500 font-sans antialiased ${
         isDarkMode ? 'bg-[#0b111a] text-slate-200' : 'bg-slate-50 text-slate-900'
       }`}>
-        
-        {/* SIDEBAR: Berisi ikon navigasi utama */}
-        <Sidebar isDarkMode={isDarkMode} />
 
-        {/* MAIN AREA: Konten di sebelah kanan sidebar */}
+        <Sidebar isDarkMode={isDarkMode} />
+        
+               {/* MAIN AREA: Konten di sebelah kanan sidebar */}
         <div className={`flex-1 flex flex-col h-full relative transition-colors duration-300 ${
           isDarkMode ? 'bg-[#1e4e8c]' : 'bg-blue-500'
         }`}>
