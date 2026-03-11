@@ -14,13 +14,17 @@ import { Manual } from './views/manual';
 import ManualROS2 from './pages/manualros2'; 
 import AutonomousROS2 from './pages/AutonomousROS2'; 
 
-// ✅ IMPORT HASIL KERJA TIM LAIN (Jangan dihapus biar ga diamuk tim)
+// ✅ IMPORT HASIL KERJA TIM (Params, Mission, Ping, dll)
 import ParamsView from './views/params'; 
 import MissionControl from './views/Mission';
 import PingSonarView from './views/ping'; 
 import LogBrowser from './views/browser'; 
 import VideoStream from './views/video'; 
 import VehicleSetup from './views/VehicleSetup/index';
+
+// ✅ IMPORT HASIL KERJA NAUU (Simulation, SysInfo, BlueOS)
+import { SystemInformation } from './views/SystemInformation';
+import BlueOSVersion from './views/BlueOSVersion';
 
 // Import Types
 import { TelemetryData } from './types/telemetry';
@@ -120,10 +124,11 @@ function App() {
           <main className="flex-1 overflow-y-auto p-6 md:p-8 z-10">
             <div className="max-w-7xl mx-auto">
               <Routes>
-                {/* Rute Halaman Utama */}
+                {/* Rute Halaman Utama & Dashboard */}
                 <Route path="/" element={<Home />} />
                 <Route path="/live" element={<Dashboard telemetry={telemetry} />} />
                 
+                {/* 🎮 RUTE SIMULASI & KONTROL */}
                 {/* Manual MAVLink Lama */}
                 <Route path="/manual" element={
                   <div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">
@@ -136,29 +141,36 @@ function App() {
                   </div>
                 } />
 
-                {/* Manual ROS2 Gazebo (Mahen's Update) */}
+                {/* Manual ROS2 Gazebo */}
                 <Route path="/manualros2" element={
                   <div className="p-1 text-white">
                     <ManualROS2 />
                   </div>
                 } />
                 
-                {/* Autonomous ROS2 (Mahen's Update) */}
+                {/* Autonomous ROS2 */}
                 <Route path="/autonomous" element={
                   <div className="p-1 text-white">
                     <AutonomousROS2 />
                   </div>
                 } />
 
-                {/* 🛡️ Rute Tambahan dari Tim Lain */}
+                {/* 🔧 RUTE PENGATURAN & SISTEM */}
+                <Route path="/setup" element={<VehicleSetup />} />
                 <Route path="/params" element={<ParamsView />} /> 
                 <Route path="/mission" element={<MissionControl />} /> 
                 <Route path="/ping" element={<PingSonarView />} /> 
                 <Route path="/browser" element={<LogBrowser />} /> 
                 <Route path="/video" element={<VideoStream />} />
-                <Route path="/setup" element={<VehicleSetup />} />
+                <Route path="/system-info" element={<SystemInformation />} />
+                
+                <Route path="/blueos" element={
+                  <div className="p-10 text-white bg-black/20 rounded-xl border border-white/5">
+                    <BlueOSVersion />
+                  </div>
+                } />
 
-                {/* Redirect jika route tidak ditemukan */}
+                {/* Redirect jika route tidak ditemukan. PASTIKAN INI SELALU DI PALING BAWAH! */}
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>

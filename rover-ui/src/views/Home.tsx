@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 // Pastikan path ke MenuCard ini sesuai dengan folder kamu
 import { MenuCard } from '../components/MenuCard';
 
-// Gabungan menu dari kedua branch, diurutkan secara logis
+// Gabungan menu yang sudah DIBERSIHKAN dari duplikat hasil merge
 const menus = [
+  // 🎮 KELOMPOK SIMULASI & KONTROL
   { 
     path: '/manual', 
     title: 'Manual Simulation (MAVLink)', 
@@ -24,23 +25,13 @@ const menus = [
     icon: '🛰️'
   },
   { 
-    path: '/Mission', 
+    path: '/mission', // Ubah huruf kecil agar sesuai dengan App.tsx
     title: 'Mission Control', 
     desc: 'Create, manage, and execute navigation missions with real-time updates.', 
     icon: '🎯' 
   },
-  { 
-    path: '/simulation', 
-    title: 'Autopilot Firmware',  
-    desc: 'Update and manage flight controller firmware.', 
-    icon: '🚀' 
-  },
-  { 
-    path: '/params',   
-    title: 'Autopilot Parameters',
-    desc: 'Modify vehicle parameters in real-time.', 
-    icon: '📑' 
-  },
+
+  // 📊 KELOMPOK MONITORING & TELEMETRI
   { 
     path: '/live',     
     title: 'Live Telemetry',      
@@ -54,10 +45,30 @@ const menus = [
     icon: '📹' 
   },
   { 
+    path: '/ping',       
+    title: 'Ping Sonar Devices',   
+    desc: 'Manage detected Ping family sonar devices.', 
+    icon: '📡' 
+  },
+
+  // 🔧 KELOMPOK PENGATURAN & SISTEM
+  { 
     path: '/setup',    
     title: 'Vehicle Setup',       
     desc: 'Sensor calibrations and motor tests.',    
-    icon: '⚙️' 
+    icon: '🔧' // Pakai icon kunci inggris agar beda dengan ROS 2
+  },
+  { 
+    path: '/params',   
+    title: 'Autopilot Parameters',
+    desc: 'Modify vehicle parameters in real-time.', 
+    icon: '📑' 
+  },
+  { 
+    path: '/simulation', 
+    title: 'Autopilot Firmware',  
+    desc: 'Update and manage flight controller firmware.', 
+    icon: '🚀' 
   },
   { 
     path: '/browser',    
@@ -66,10 +77,16 @@ const menus = [
     icon: '📁' 
   },
   { 
-    path: '/ping',       
-    title: 'Ping Sonar Devices',   
-    desc: 'Manage detected Ping family sonar devices.', 
-    icon: '📡' 
+    path: '/system-info', 
+    title: 'System Information', 
+    desc: 'Monitor system, processes, and kernel.', 
+    icon: '🖥️' 
+  },
+  { 
+    path: '/blueos',      
+    title: 'BlueOS Version',      
+    desc: 'Manage system firmware and updates.', 
+    icon: '📦' 
   },
 ];
 
@@ -87,6 +104,7 @@ export const Home: React.FC = () => {
         </p>
       </div>
       
+      {/* Grid Menu Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {menus.map((m) => (
           <MenuCard 
