@@ -96,5 +96,89 @@ echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
+**5. Install Development Tools**
+```bash
+sudo apt install ros-dev-tools python3-colcon-common-extensions
+```
+
 ---
+## 🎮 Panduan Instalasi Gazebo (Harmonic)
+Gazebo Harmonic adalah simulator standar untuk ROS 2 Jazzy guna menjalankan simulasi ROV.
+
+**1. Instalasi Gazebo**
+```bash
+sudo apt-get update
+sudo apt-get install lsb-release wget gnupg
+
+# Tambahkan Key & Repository Gazebo
+sudo wget [https://packages.osrfoundation.org/gazebo.gpg](https://packages.osrfoundation.org/gazebo.gpg) -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] [http://packages.osrfoundation.org/gazebo/ubuntu-stable](http://packages.osrfoundation.org/gazebo/ubuntu-stable) $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+
+# Install Gazebo Harmonic
+sudo apt-get update
+sudo apt-get install gz-harmonic
+```
+**2. Integrasi ROS 2 & Gazebo (GZ Bridge)**
+Agar data dari Gazebo bisa dibaca oleh website melalui ROS 2, kamu perlu menginstal bridge:
+```bash
+sudo apt install ros-jazzy-ros-gz
+```
+
+---
+## 🕹️ Fitur Kendali & Simulasi
+
+Dashboard ini menyediakan antarmuka kendali yang komprehensif untuk memastikan operasional ROV berjalan aman dan presisi, baik dalam lingkungan simulasi maupun nyata.
+
+### 🎮 1. Manual Override (6-DOF Control)
+Fitur ini memungkinkan operator untuk mengambil kendali penuh atas pergerakan robot secara manual.
+- **Linear Axis:** Mengatur pergerakan maju-mundur (*Forward*), geser kiri-kanan (*Lateral*), dan naik-turun (*Vertical*).
+- **Angular Axis:** Mengontrol orientasi robot meliputi *Roll*, *Pitch*, dan *Yaw* untuk navigasi bawah air yang kompleks.
+- **Real-time PWM Monitoring:** Menampilkan nilai PWM aktif untuk setiap kanal (CH1 - CH6) guna memastikan sinkronisasi antara input operator dan respon *thruster*.
+- **Auxiliary Control:** Kendali tambahan untuk menyalakan lampu (*Lights*) dan mengoperasikan penjepit (*Gripper*).
+
+#### 📋Pre-Flight Checklist
+Sistem keamanan yang memastikan seluruh komponen perangkat lunak siap sebelum robot dijalankan. Operator wajib menyelesaikan tahapan inisialisasi:
+1. **Environment Setup:** Mengaktifkan simulator ArduSub SITL pada Ubuntu/WSL.
+2. **QGroundControl Connection:** Opsional, untuk validasi model 3D dan koneksi UDP.
+3. **Backend Synchronization:** Memastikan jembatan FastAPI telah terhubung (status *Connected*) untuk transmisi data telemetri.
+
+#### 🌐Integrasi Gazebo & ArduSub SITL
+Project ini dirancang untuk bekerja secara mulus dengan simulator **Gazebo** melalui firmware **ArduSub**.
+- **Telemetri Real-time:** Menampilkan data *Roll, Pitch,* dan *Heading* langsung dari simulator ke dashboard web.
+- **Environment Virtual:** Memungkinkan pengujian logika kontrol dan manuver ROV dalam tangki air virtual tanpa risiko kerusakan perangkat keras asli.
+---
+
+### ⚙️ 2. Direct Thruster Matrix & Command Queue
+Fitur ini dirancang untuk kebutuhan teknis dan kalibrasi sistem penggerak ROV secara individu.
+- **Individual Thruster Control:** Operator dapat mengatur kecepatan/daya tiap thruster (T1 hingga T6) secara mandiri menggunakan slider, memudahkan pengecekan jika ada thruster yang macet atau tidak seimbang.
+- **Command Queue (Antrean Perintah):** Fitur untuk menyusun urutan perintah gerakan tertentu sebelum dieksekusi secara masal melalui tombol "Apply Semua".
+- **Safety Mechanism:** Dilengkapi dengan tombol **Emergency Stop All** yang akan mematikan seluruh aliran daya ke aktuator secara instan jika terjadi malfungsi saat simulasi.
+#### 🛡️ROS 2 Pre-Flight Checklist (Advanced)
+Untuk menjamin stabilitas komunikasi antara Web Dashboard dan simulator, sistem menyediakan validasi berlapis:
+1. **Gazebo & ROSBridge Aktif:** Memastikan jembatan WebSocket (`rosbridge_suite`) telah berjalan untuk mengirimkan data dari backend ke frontend.
+2. **Thruster Manager Standby:** Memvalidasi bahwa node Python `thruster_manager.py` sudah siap memproses kalkulasi matriks kinematika robot.
+3. **Connection Guard:** Dashboard akan menampilkan status "Koneksi Gagal" disertai instruksi perbaikan jika komunikasi data terputus.
+---
+
+### 🤖 3. Autonomous Mission Control
+Fitur navigasi otonom yang memungkinkan ROV menjalankan misi secara mandiri berdasarkan titik koordinat (Waypoints) yang ditentukan. Fitur ini memiliki dua mode utama:
+
+- **Mode 1 — Waypoint + Orientasi:** Operator dapat menentukan titik tujuan pada peta. Setelah titik dipilih, muncul pop-up konfirmasi untuk mengatur kedalaman (*Depth*) dan orientasi robot saat tiba di lokasi tersebut.
+- **Mode 2 — Path Drawing:** Memungkinkan operator membuat jalur navigasi dengan cara klik dan tahan pada peta (*drag*) untuk menentukan arah hadap secara visual, lalu melepaskannya untuk menyimpan urutan waypoint.
+
+**Fitur Pendukung Otonom:**
+- **Default Depth Control:** Slider untuk mengatur kedalaman operasional standar (contoh: -2.0m) agar ROV tetap berada di level air yang diinginkan.
+- **Mission Database:** Kemampuan untuk memuat (*Load*) misi yang sebelumnya telah disimpan di database dan menjalankannya kembali ke simulator.
+- **Real-time Telemetry Tracking:** Memantau posisi koordinat X, Y, Z, serta nilai Yaw dan Heading secara presisi saat robot bergerak menuju target.
+---
+### 📋 4. Mission Management (Builder & Library)
+Fitur ini berfungsi sebagai pusat perencanaan misi sebelum ROV dideploy ke simulator atau lapangan. Operator dapat merancang skenario misi yang kompleks secara terorganisir.
+
+- **Mission Builder:** Antarmuka interaktif untuk menyusun urutan koordinat (Sequence) secara grafis. Operator dapat memberikan nama misi (misal: "Inspeksi Pipa A") dan memilih mode navigasi yang diinginkan.
+- **Saved Missions Library:** Fitur penyimpanan yang memungkinkan operator mencari dan memuat kembali misi-misi yang telah dibuat sebelumnya dari database. Hal ini memudahkan pengujian ulang skenario yang sama secara konsisten.
+- **Mission Sequence Preview:** Panel kanan menampilkan daftar urutan titik waypoint yang telah direncanakan beserta estimasi kedalamannya, memberikan gambaran utuh rencana perjalanan robot.
+- **Database Integration:** Seluruh konfigurasi misi disimpan secara terpusat, memastikan data misi tidak hilang saat aplikasi ditutup atau direstart.
+---
+
+
 *Dikembangkan untuk proyek Rancang Bangun ROV - Politeknik Manufaktur Bandung*
